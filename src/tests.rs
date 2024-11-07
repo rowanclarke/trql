@@ -58,3 +58,15 @@ fn tree() {
     );
 }
 
+#[test]
+fn children() {
+    let tree = test_tree();
+
+    println!(
+        "{:?}",
+        Operation::Children
+            .execute::<TestTree, _>(tree)
+            .map(|node| node.value().map(|s| s.to_string()))
+            .collect::<Vec<_>>()
+    );
+}
