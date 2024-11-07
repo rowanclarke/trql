@@ -1,5 +1,5 @@
-use parser::Operation;
-use tree::{children, Children, Tree};
+use parser::{Operation, Select};
+use tree::{Children, Condition, Descendants, Tree};
 
 #[macro_use]
 extern crate pest_derive;
@@ -24,6 +24,7 @@ impl Command for Operation {
     ) -> Box<dyn Iterator<Item = T::Node>> {
         match self {
             Self::Children => Box::new(Children::<T, I>::new(iter)),
+            Self::Descendants => Box::new(Descendants::<T, I>::new(iter)),
             _ => todo!(),
         }
     }
