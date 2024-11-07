@@ -1,27 +1,30 @@
+use parser::Operation;
+use tree::{children, Children, Tree};
+
 #[macro_use]
 extern crate pest_derive;
 
 mod parser;
+mod tree;
 
 #[cfg(test)]
-mod tests {
-    use pest::Parser;
+mod tests;
 
-    use crate::parser::{QueryParser, Rule};
+pub trait Command {
+    fn execute<T: Tree + 'static, I: Iterator<Item = T::Node> + 'static>(
+        &self,
+        iter: I,
+    ) -> Box<dyn Iterator<Item = T::Node>>;
+}
 
-    use super::parser::to_queries;
-
-    #[test]
-    fn query() {
-        let queries = to_queries(
-            QueryParser::parse(
-                Rule::queries,
-                "…node
-  id = id
-  content = content",
-            )
-            .unwrap(),
-        );
-        println!("{:?}", queries);
+impl Command for Operation {
+    fn execute<T: Tree + 'static, I: Iterator<Item = T::Node> + 'static>(
+        &self,
+        iter: I,
+    ) -> Box<dyn Iterator<Item = T::Node>> {
+        match self {
+            Self::Children => Box::new(children::<T, I>(iter)),
+            _ => todo!(),
+        }
     }
 }
