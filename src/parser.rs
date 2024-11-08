@@ -20,7 +20,6 @@ pub enum Operation {
     Parallel(Select),
     Condition(Select),
     Range { from: isize, to: isize, step: isize },
-    Index(isize),
     Descendants,
     Children,
     Token(String),
@@ -74,7 +73,14 @@ pub fn to_operation(pair: Pair<Rule>) -> Operation {
                     });
             Operation::Range { from, to, step }
         }
-        Rule::index => Operation::Index(pair.as_str().parse().unwrap()),
+        Rule::index => {
+            let index = pair.as_str().parse().unwrap();
+            Operation::Range {
+                from: index,
+                to: index,
+                step: 1,
+            }
+        }
         Rule::descendants => Operation::Descendants,
         Rule::children => Operation::Children,
         Rule::token => Operation::Token(pair.as_str().to_owned()),
