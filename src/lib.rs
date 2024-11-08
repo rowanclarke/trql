@@ -39,6 +39,7 @@ impl Command for Operation {
         match self {
             Self::Children => Box::new(Children::<T, I>::new(iter)),
             Self::Descendants => Box::new(Descendants::<T, I>::new(iter)),
+            Self::Parallel(select) => select.execute(iter),
             Self::Condition(select) => Box::new(Condition::new(iter, move |tree: T| {
                 select.clone().execute::<T, T>(tree)
             })),
