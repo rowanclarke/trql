@@ -1,3 +1,6 @@
+use dyn_clone::DynClone;
+use std::{marker::PhantomData, ops::Index};
+
 pub trait Node: Clone {
     type Tree: Tree<Node = Self>;
     type FlatTree: FlatTree<Node = Self>;
@@ -16,13 +19,56 @@ pub trait FlatTree: Clone + Iterator<Item = Self::Node> {
     type Node: Node<FlatTree = Self>;
 }
 
+pub trait Nodes<T: Tree>: Clone + DynNodes<T> {}
+
+pub trait DynNodes<T: Tree>: DynClone + Iterator<Item = T::Node> {}
+
+impl<T: Tree, I: Iterator<Item = T::Node> + Clone> Nodes<T> for I {}
+
+impl<T: Tree, I: Iterator<Item = T::Node> + Clone> DynNodes<T> for I {}
+
+impl<T: Tree> Clone for Box<dyn DynNodes<T>> {
+    fn clone(&self) -> Self {
+        dyn_clone::clone_box(&**self)
+    }
+}
+
 #[derive(Clone)]
-pub struct Children<T: Tree, I: Iterator<Item = T::Node>> {
+pub struct Chain<T: Tree> {
+    index: usize,
+    iters: Vec<Box<dyn DynNodes<T>>>,
+}
+
+impl<T: Tree> Chain<T> {
+    pub fn new(iters: Vec<Box<dyn DynNodes<T>>>) -> Self {
+        Self { index: 0, iters }
+    }
+}
+
+impl<T: Tree> Iterator for Chain<T> {
+    type Item = T::Node;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(iter) = self.iters.get_mut(self.index) {
+            if let Some(node) = iter.next() {
+                Some(node)
+            } else {
+                self.index += 1;
+                self.next()
+            }
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct Children<T: Tree, I: Nodes<T>> {
     iter: I,
     child: Option<T>,
 }
 
-impl<T: Tree, I: Iterator<Item = T::Node>> Children<T, I> {
+impl<T: Tree, I: Nodes<T>> Children<T, I> {
     pub fn new(mut iter: I) -> Self {
         Self {
             child: iter.next().map(Node::tree),
@@ -31,7 +77,7 @@ impl<T: Tree, I: Iterator<Item = T::Node>> Children<T, I> {
     }
 }
 
-impl<T: Tree, I: Iterator<Item = T::Node>> Iterator for Children<T, I> {
+impl<T: Tree, I: Nodes<T>> Iterator for Children<T, I> {
     type Item = T::Node;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -48,12 +94,13 @@ impl<T: Tree, I: Iterator<Item = T::Node>> Iterator for Children<T, I> {
     }
 }
 
-pub struct Descendants<T: Tree, I: Iterator<Item = T::Node>> {
+#[derive(Clone)]
+pub struct Descendants<T: Tree, I: Nodes<T>> {
     iter: I,
     flat_child: Option<<T::Node as Node>::FlatTree>,
 }
 
-impl<T: Tree, I: Iterator<Item = T::Node>> Descendants<T, I> {
+impl<T: Tree, I: Nodes<T>> Descendants<T, I> {
     pub fn new(mut iter: I) -> Self {
         Self {
             flat_child: iter.next().map(Node::flat_tree),
@@ -62,7 +109,7 @@ impl<T: Tree, I: Iterator<Item = T::Node>> Descendants<T, I> {
     }
 }
 
-impl<T: Tree, I: Iterator<Item = T::Node>> Iterator for Descendants<T, I> {
+impl<T: Tree, I: Nodes<T>> Iterator for Descendants<T, I> {
     type Item = T::Node;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -76,6 +123,39 @@ impl<T: Tree, I: Iterator<Item = T::Node>> Iterator for Descendants<T, I> {
         } else {
             None
         }
+    }
+}
+
+#[derive(Clone)]
+pub struct Condition<
+    T: Tree,
+    I: Iterator<Item = T::Node>,
+    J: Iterator<Item = T::Node>,
+    F: FnMut(T) -> J,
+> {
+    iter: I,
+    f: F,
+    phantom: PhantomData<(T, J)>,
+}
+
+impl<T: Tree, I: Nodes<T>, J: Iterator<Item = T::Node>, F: FnMut(T) -> J> Condition<T, I, J, F> {
+    pub fn new(iter: I, f: F) -> Self {
+        Self {
+            iter,
+            f,
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl<T: Tree, I: Nodes<T>, J: Iterator<Item = T::Node>, F: FnMut(T) -> J> Iterator
+    for Condition<T, I, J, F>
+{
+    type Item = T::Node;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter
+            .find(|node| (self.f)(node.clone().tree()).next().is_some())
     }
 }
 

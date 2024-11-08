@@ -15,7 +15,7 @@ pub type Select = Vec<Series>;
 
 pub type Series = Vec<Operation>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Operation {
     Parallel(Select),
     Condition(Select),
