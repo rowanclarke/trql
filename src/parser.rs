@@ -1,29 +1,12 @@
+use std::rc::Rc;
+
 use pest::iterators::{Pair, Pairs};
+
+use crate::query::{Operation, Query, Select, Series};
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"] // relative to src
 pub struct QueryParser;
-
-#[derive(Debug)]
-pub struct Query {
-    name: Option<String>,
-    select: Select,
-    subqueries: Vec<Query>,
-}
-
-pub type Select = Vec<Series>;
-
-pub type Series = Vec<Operation>;
-
-#[derive(Debug, Clone)]
-pub enum Operation {
-    Parallel(Select),
-    Condition(Select),
-    Range { from: isize, to: isize, step: isize },
-    Descendants,
-    Children,
-    Token(String),
-}
 
 pub fn to_queries(pairs: Pairs<Rule>) -> Vec<Query> {
     pairs.map(to_query).collect()
@@ -32,16 +15,12 @@ pub fn to_queries(pairs: Pairs<Rule>) -> Vec<Query> {
 pub fn to_query(pair: Pair<Rule>) -> Query {
     let mut pairs = pair.into_inner();
     match pairs.next() {
-        Some(n) if n.as_rule() == Rule::name => Query {
-            name: Some(n.as_str().to_owned()),
-            select: to_select(pairs.next().unwrap()),
-            subqueries: to_queries(pairs),
-        },
-        Some(s) => Query {
-            name: None,
-            select: to_select(s),
-            subqueries: to_queries(pairs),
-        },
+        Some(n) if n.as_rule() == Rule::name => Query::new(
+            Some(n.as_str().to_owned()),
+            to_select(pairs.next().unwrap()),
+            to_queries(pairs),
+        ),
+        Some(s) => Query::new(None, to_select(s), to_queries(pairs)),
         _ => unreachable!(),
     }
 }
