@@ -1,7 +1,13 @@
 [package]
 name = "trql_derive"
 version = "0.1.0"
+authors = ["Rowan Clarke <36474636+rowanclarke@users.noreply.github.com>"]
+license = "MIT"
+description = "Derive macro for the `trql` crate."
 edition = "2021"
+repository = "https://github.com/rowanclarke/trql"
+readme = "README.md"
+keywords = ["tree", "search", "language"]
 
 [lib]
 proc-macro = true
