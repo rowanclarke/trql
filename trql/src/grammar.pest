@@ -1,0 +1,21 @@
+WHITESPACE = _{ " " }
+numeric = _{ "-"? ~ ('0'..'9')+ }
+literal = _{ ('a'..'z')+ }
+
+from = ${ numeric }
+to = ${ numeric }
+step = ${ numeric }
+index = ${ numeric }
+range = { from? ~ ":" ~ to? ~ (":" ~ step)? }
+
+descendants = { "…" }
+children = { "." }
+parallel = { "(" ~ select ~ ")" }
+condition = { "[" ~ select ~ "]" }
+token = ${ literal }
+series = { (parallel | condition | range | index | descendants | children | token)* }
+select = !{ series ~ ("," ~ series)* }
+
+name = ${ literal }
+query = ${ (name ~ WHITESPACE* ~ "=")? ~ WHITESPACE* ~ select ~ ("\n" ~ PEEK[..] ~ PUSH("  ") ~ query ~ DROP)* }
+queries = _{ query ~ ("\n" ~ query)* }
