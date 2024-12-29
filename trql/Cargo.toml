@@ -1,6 +1,6 @@
 [package]
 name = "trql"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Rowan Clarke <36474636+rowanclarke@users.noreply.github.com>"]
 license = "MIT"
 description = "Query language for programmatically generating structures from trees."

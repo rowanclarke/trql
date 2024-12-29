@@ -2,10 +2,10 @@
 extern crate pest_derive;
 
 mod chain;
-mod command;
-mod parser;
-mod query;
-mod tree;
+pub mod command;
+pub mod parser;
+pub mod query;
+pub mod tree;
 
 #[cfg(test)]
 mod tests;
