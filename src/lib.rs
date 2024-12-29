@@ -12,18 +12,18 @@ mod tests;
 
 pub trait Command {
     fn execute<T: Tree + 'static, I: Iterator<Item = T::Node> + 'static>(
-        &self,
+        self,
         iter: I,
     ) -> Box<dyn Iterator<Item = T::Node>>;
 }
 
 impl Command for Operation {
     fn execute<T: Tree + 'static, I: Iterator<Item = T::Node> + 'static>(
-        &self,
+        self,
         iter: I,
     ) -> Box<dyn Iterator<Item = T::Node>> {
         match self {
-            Self::Children => Box::new(children::<T, I>(iter)),
+            Self::Children => Box::new(Children::<T, I>::new(iter)),
             _ => todo!(),
         }
     }
