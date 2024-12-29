@@ -16,18 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: cargo-release Cache
+      - name: Setup cargo-release cache
         id: cargo_release_cache
         uses: actions/cache@v4
         with:
           path: ~/.cargo/bin/cargo-release
           key: ${{ runner.os }}-cargo-release
-      - run: cargo install cargo-release
+      - name: Install cargo-release
+        run: cargo install cargo-release
         if: steps.cargo_release_cache.outputs.cache-hit != 'true'
-
-      - name: cargo build
+      - name: Build
         run: cargo build
-      - name: cargo test
+      - name: Test
         run: cargo test
-      - name: cargo publish
+      - name: Publish packages
         run: cargo release publish --workspace --no-verify
