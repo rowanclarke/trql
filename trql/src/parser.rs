@@ -1,39 +1,42 @@
-use std::rc::Rc;
+use std::collections::BTreeMap;
 
 use pest::iterators::{Pair, Pairs};
 
-use crate::query::{Operation, Query, Select, Series};
+use crate::query::{Operation, Queries, Query, Select, Series};
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"] // relative to src
 pub struct QueryParser;
 
-pub fn to_queries(pairs: Pairs<Rule>) -> Vec<Query> {
-    pairs.map(to_query).collect()
+pub fn to_queries(pairs: Pairs<Rule>) -> Queries {
+    let mut map: Queries = BTreeMap::new();
+    pairs
+        .map(to_query)
+        .for_each(|(name, query)| map.entry(name).or_insert(vec![]).push(query));
+    map
 }
 
-pub fn to_query(pair: Pair<Rule>) -> Query {
+fn to_query(pair: Pair<Rule>) -> (Option<String>, Query) {
     let mut pairs = pair.into_inner();
     match pairs.next() {
-        Some(n) if n.as_rule() == Rule::name => Query::new(
+        Some(n) if n.as_rule() == Rule::name => (
             Some(n.as_str().to_owned()),
-            to_select(pairs.next().unwrap()),
-            to_queries(pairs),
+            Query::new(to_select(pairs.next().unwrap()), to_queries(pairs)),
         ),
-        Some(s) => Query::new(None, to_select(s), to_queries(pairs)),
+        Some(s) => (None, Query::new(to_select(s), to_queries(pairs))),
         _ => unreachable!(),
     }
 }
 
-pub fn to_select(pair: Pair<Rule>) -> Select {
+fn to_select(pair: Pair<Rule>) -> Select {
     pair.into_inner().map(to_series).collect()
 }
 
-pub fn to_series(pair: Pair<Rule>) -> Series {
+fn to_series(pair: Pair<Rule>) -> Series {
     pair.into_inner().map(to_operation).collect()
 }
 
-pub fn to_operation(pair: Pair<Rule>) -> Operation {
+fn to_operation(pair: Pair<Rule>) -> Operation {
     match pair.as_rule() {
         Rule::parallel => Operation::Parallel(to_select(pair.into_inner().next().unwrap())),
         Rule::condition => Operation::Condition(to_select(pair.into_inner().next().unwrap())),

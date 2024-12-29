@@ -2,7 +2,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Fields};
 
-#[proc_macro_derive(FromNodes)]
+#[proc_macro_derive(QueryResult)]
 pub fn my_trait_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let struct_name = input.ident;
@@ -26,25 +26,31 @@ pub fn my_trait_derive(input: TokenStream) -> TokenStream {
     };
 
     let expanded = quote! {
-        impl<T: Tree + 'static> FromNodes<T> for #struct_name {
-            fn from_nodes(queries: Vec<Query>, nodes: Box<dyn DynNodes<T>>) -> Self {
+        impl<'a, T: Tree + 'a> QueryResult<'a, T> for #struct_name {
+            fn from_nodes(queries: Queries, nodes: Box<dyn DynNodes<T> + 'a>) -> Self {
                 #(let mut #field_name: Option<#field_type> = None;)*
-                for query in queries {
-                    match query.into_named() {
-                        #(
-                        Some((name, select, subqueries)) if name == stringify!(#field_name) => {
-                            #field_name = Some(String::from_nodes(
-                                subqueries,
-                                select.execute::<T, _>(nodes.clone()),
+                for (name, queries) in queries {
+                    match name.as_ref().map(String::as_str) {
+                        #(Some(stringify!(#field_name)) => {
+                            #field_name = Some(<#field_type>::from_nodes(
+                                once((None, queries)).collect(),
+                                nodes.clone(),
                             ))
-                        },
-                        )*
+                        },)*
                         _ => (),
                     }
                 }
                 Self {
                     #(#field_name: #field_name.unwrap(),)*
                 }
+            }
+
+            fn from_node(queries: Queries, node: T::Node) -> Self {
+                Self::from_nodes(queries, Box::new(node.tree()) as Box<dyn DynNodes<T>>)
+            }
+
+            fn from_leaf(_node: T::Node) -> Self {
+                panic!("Cannot create object from leaf.")
             }
         }
     };

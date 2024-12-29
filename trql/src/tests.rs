@@ -1,20 +1,16 @@
-use pest::Parser;
-use trql_derive::FromNodes;
+use trql_derive::QueryResult;
 
 use crate::{
-    command::Command,
-    parser::{QueryParser, Rule},
-    query::{execute, FromNodes, Operation, Query, Series},
-    tree::{Descendants, DynNodes, Node, Tree},
+    query::{execute, Queries, QueryResult},
+    tree::{DynNodes, Node, Tree},
 };
 
-use super::parser::to_queries;
-use std::rc::Rc;
+use std::{iter::once, rc::Rc};
 
 mod tree;
 use tree::*;
 
-#[derive(Debug, FromNodes)]
+#[derive(PartialEq, Eq, Debug, QueryResult)]
 struct Item {
     id: String,
     content: String,
@@ -41,16 +37,17 @@ fn test_tree() -> TestTree {
 fn tree() {
     let tree = test_tree();
 
-    let queries = to_queries(
-        QueryParser::parse(
-            Rule::queries,
-            "…item 1
+    let result: Vec<Item> = execute(
+        "…item 1
   id = id
   content = content",
-        )
-        .unwrap(),
+        tree,
     );
-
-    let result: Vec<Item> = execute(queries, tree);
-    println!(">> {:?}", result);
+    assert_eq!(
+        result,
+        vec![Item {
+            id: "a".into(),
+            content: "A".into()
+        }]
+    )
 }

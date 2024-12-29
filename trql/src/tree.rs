@@ -29,13 +29,13 @@ impl<T: Tree, I: Iterator<Item = T::Node> + Clone> Nodes<T> for I {}
 
 impl<T: Tree, I: Iterator<Item = T::Node> + Clone> DynNodes<T> for I {}
 
-impl<T: Tree> Clone for Box<dyn DynNodes<T>> {
+impl<'a, T: Tree + 'a> Clone for Box<dyn DynNodes<T> + 'a> {
     fn clone(&self) -> Self {
         dyn_clone::clone_box(&**self)
     }
 }
 
-pub type Chain<T> = chain::Chain<Box<dyn DynNodes<T>>>;
+pub type Chain<'a, T> = chain::Chain<Box<dyn DynNodes<T> + 'a>>;
 
 #[derive(Clone)]
 pub struct Children<T: Tree, I: Nodes<T>> {

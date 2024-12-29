@@ -1,43 +1,88 @@
-use std::{marker::PhantomData, rc::Rc};
+use std::collections::BTreeMap;
+
+use pest::Parser;
 
 use crate::{
     command::Command,
+    parser::{to_queries, QueryParser, Rule},
     tree::{DynNodes, Node, Tree},
 };
 
-pub fn execute<T: Tree + 'static, I: FromNodes<T>>(queries: Vec<Query>, tree: T) -> I {
-    I::from_nodes(queries, Box::new(tree) as Box<dyn DynNodes<T>>)
+pub fn execute<'a, T: Tree + 'a, I: QueryResult<'a, T>>(queries: &str, tree: T) -> I {
+    I::from_nodes(
+        to_queries(QueryParser::parse(Rule::queries, queries).unwrap()),
+        Box::new(tree),
+    )
 }
 
-pub trait FromNodes<T: Tree>: Sized {
-    fn from_nodes(queries: Vec<Query>, nodes: Box<dyn DynNodes<T>>) -> Self;
+type Nodes<'a, T> = Box<dyn DynNodes<T> + 'a>;
+
+pub trait QueryResult<'a, T: Tree + 'a>: Sized {
+    fn from_nodes(queries: Queries, nodes: Nodes<'a, T>) -> Self;
+    fn from_leaf(leaf: T::Node) -> Self;
+
+    fn from_node(queries: Queries, node: <T as Tree>::Node) -> Self {
+        if queries.is_empty() {
+            Self::from_leaf(node)
+        } else {
+            Self::from_nodes(queries, Box::new(node.tree()))
+        }
+    }
 }
 
-impl<T: Tree + 'static, I: FromNodes<T>> FromNodes<T> for Vec<I> {
-    fn from_nodes(queries: Vec<Query>, nodes: Box<dyn DynNodes<T>>) -> Self {
+impl<'a, T: Tree + 'a, I: QueryResult<'a, T>> QueryResult<'a, T> for Vec<I> {
+    fn from_nodes(queries: Queries, nodes: Nodes<'a, T>) -> Self {
         queries
+            .get(&None)
+            .unwrap()
             .into_iter()
-            .flat_map(|query| {
-                let (select, subqueries) = query.into_unnamed().unwrap();
+            .flat_map(|Query { select, subqueries }| {
                 select
+                    .clone()
                     .execute::<T, _>(nodes.clone())
-                    .map(move |node| I::from_nodes(subqueries.clone(), Box::new(node.tree())))
+                    .map(|node| I::from_node(subqueries.clone(), node))
             })
             .collect()
     }
-}
 
-impl<T: Tree> FromNodes<T> for String {
-    fn from_nodes(_: Vec<Query>, nodes: Box<dyn DynNodes<T>>) -> Self {
-        nodes.fold(String::new(), |s, node| s + node.value().unwrap())
+    fn from_leaf(leaf: <T as Tree>::Node) -> Self {
+        vec![I::from_leaf(leaf)]
     }
 }
 
+impl<'a, T: Tree + 'a> QueryResult<'a, T> for String {
+    fn from_nodes(queries: Queries, nodes: Nodes<'a, T>) -> Self {
+        queries.get(&None).unwrap().into_iter().fold(
+            String::new(),
+            |mut s, Query { select, subqueries }| {
+                select
+                    .clone()
+                    .execute::<T, _>(nodes.clone())
+                    .for_each(|node| {
+                        s += &<Self as QueryResult<T>>::from_node(subqueries.clone(), node)
+                    });
+                s
+            },
+        )
+    }
+
+    fn from_leaf(node: T::Node) -> Self {
+        node.value().unwrap().to_owned()
+    }
+}
+
+pub type Queries = BTreeMap<Option<String>, Vec<Query>>;
+
 #[derive(Debug, Clone)]
 pub struct Query {
-    name: Option<String>,
-    select: Select,
-    subqueries: Vec<Query>,
+    pub(crate) select: Select,
+    pub(crate) subqueries: Queries,
+}
+
+impl Query {
+    pub fn new(select: Select, subqueries: Queries) -> Self {
+        Self { select, subqueries }
+    }
 }
 
 pub type Select = Vec<Series>;
@@ -52,28 +97,4 @@ pub enum Operation {
     Descendants,
     Children,
     Token(String),
-}
-
-impl Query {
-    pub fn new(name: Option<String>, select: Select, subqueries: Vec<Query>) -> Self {
-        Self {
-            name,
-            select,
-            subqueries,
-        }
-    }
-
-    pub fn into_named(self) -> Option<(String, Select, Vec<Query>)> {
-        match self.name {
-            Some(s) => Some((s, self.select, self.subqueries)),
-            None => None,
-        }
-    }
-
-    pub fn into_unnamed(self) -> Option<(Select, Vec<Query>)> {
-        match self.name {
-            Some(_) => None,
-            None => Some((self.select, self.subqueries)),
-        }
-    }
 }

@@ -4,11 +4,11 @@ use crate::{
 };
 
 pub trait Command {
-    fn execute<T: Tree + 'static, I: Nodes<T> + 'static>(self, iter: I) -> Box<dyn DynNodes<T>>;
+    fn execute<'a, T: Tree + 'a, I: Nodes<T> + 'a>(self, iter: I) -> Box<dyn DynNodes<T> + 'a>;
 }
 
 impl Command for Select {
-    fn execute<T: Tree + 'static, I: Nodes<T> + 'static>(self, iter: I) -> Box<dyn DynNodes<T>> {
+    fn execute<'a, T: Tree + 'a, I: Nodes<T> + 'a>(self, iter: I) -> Box<dyn DynNodes<T> + 'a> {
         Box::new(Chain::<T>::new(
             self.into_iter()
                 .map(|x| x.execute::<T, I>(iter.clone()))
@@ -18,17 +18,17 @@ impl Command for Select {
 }
 
 impl Command for Series {
-    fn execute<T: Tree + 'static, I: Nodes<T> + 'static>(self, iter: I) -> Box<dyn DynNodes<T>> {
-        let mut iter = Box::new(iter) as Box<dyn DynNodes<T>>;
+    fn execute<'a, T: Tree + 'a, I: Nodes<T> + 'a>(self, iter: I) -> Box<dyn DynNodes<T> + 'a> {
+        let mut iter = Box::new(iter) as Box<dyn DynNodes<T> + 'a>;
         for command in self {
-            iter = command.execute::<T, Box<dyn DynNodes<T>>>(iter);
+            iter = command.execute::<T, Box<dyn DynNodes<T> + 'a>>(iter);
         }
         iter
     }
 }
 
 impl Command for Operation {
-    fn execute<T: Tree + 'static, I: Nodes<T> + 'static>(self, iter: I) -> Box<dyn DynNodes<T>> {
+    fn execute<'a, T: Tree + 'a, I: Nodes<T> + 'a>(self, iter: I) -> Box<dyn DynNodes<T> + 'a> {
         match self {
             Self::Parallel(select) => select.execute(iter),
             Self::Condition(select) => Box::new(Condition::new(iter, move |tree: T| {
