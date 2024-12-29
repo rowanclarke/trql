@@ -14,20 +14,25 @@ jobs:
     name: Publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Setup cargo-release cache
-        id: cargo_release_cache
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Setup Cache
+        id: cache
         uses: actions/cache@v4
         with:
-          path: ~/.cargo/bin/cargo-release
-          key: ${{ runner.os }}-cargo-release
-      - name: Install cargo-release
-        run: cargo install cargo-release
-        if: steps.cargo_release_cache.outputs.cache-hit != 'true'
+          path: ~/.cargo/bin/cargo-workspaces
+          key: ${{ runner.os }}-cargo-workspaces
+      - name: Install cargo-workspaces
+        run: cargo install cargo-workspaces
+        if: steps.cache.outputs.cache-hit != 'true'
       - name: Build
         run: cargo build
       - name: Test
         run: cargo test
-      - name: Publish packages
-        run: cargo release publish --workspace --no-verify
+      - name: Publish All Packages
+        run: cargo workspaces publish --from-git --yes --no-verify
