@@ -1,12 +1,13 @@
+mod command;
+mod parser;
+
 use std::collections::BTreeMap;
 
 use pest::Parser;
 
-use crate::{
-    command::Command,
-    parser::{to_queries, QueryParser, Rule},
-    tree::{DynNodes, Node, Tree},
-};
+use crate::tree::{DynNodes, Node, Tree};
+use command::Command;
+use parser::{to_queries, QueryParser, Rule};
 
 pub fn execute<'a, T: Tree + 'a, I: QueryResult<'a, T>>(queries: &str, tree: T) -> I {
     I::from_nodes(
