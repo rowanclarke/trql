@@ -49,7 +49,6 @@ impl Command for Operation {
             Self::Descendants => Box::new(Descendants::<T, I>::new(iter)),
             Self::Children => Box::new(Children::<T, I>::new(iter)),
             Self::Token(token) => Box::new(iter.filter(move |node| node.name() == token)),
-            _ => todo!(),
         }
     }
 }
