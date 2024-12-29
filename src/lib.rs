@@ -41,6 +41,11 @@ impl Command for Operation {
             Self::Condition(select) => Box::new(Condition::new(iter, move |tree: T| {
                 select.clone().execute::<T, T>(tree)
             })),
+            Self::Range { from, to, step } => Box::new(
+                iter.zip(1..)
+                    .filter(move |&(_, i)| (from <= i && i <= to && (i - from) % step == 0))
+                    .map(|(node, _)| node),
+            ),
             Self::Descendants => Box::new(Descendants::<T, I>::new(iter)),
             Self::Children => Box::new(Children::<T, I>::new(iter)),
             Self::Token(token) => Box::new(iter.filter(move |node| node.name() == token)),
