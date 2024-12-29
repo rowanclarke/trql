@@ -1,7 +1,13 @@
 [package]
 name = "trql"
 version = "0.1.0"
+authors = ["Rowan Clarke <36474636+rowanclarke@users.noreply.github.com>"]
+license = "MIT"
+description = "Query language for programmatically generating structures from trees."
 edition = "2021"
+repository = "https://github.com/rowanclarke/trql"
+readme = "README.md"
+keywords = ["tree", "search", "language"]
 
 [dependencies]
 dyn-clone = "1.0.17"
@@ -9,7 +15,7 @@ from-pest = "0.3.2"
 pest = "2.7.13"
 pest-ast = "0.3.4"
 pest_derive = "2.7.13"
-trql_derive ={ path = "../trql_derive" }
+trql_derive = { version = "0.1.0", path = "../trql_derive" }
 
 [dev-dependencies]
 
