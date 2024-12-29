@@ -1,5 +1,5 @@
 use parser::{Operation, Select, Series};
-use tree::{Chain, Children, Condition, Descendants, DynNodes, Nodes, Tree};
+use tree::{Chain, Children, Condition, Descendants, DynNodes, Node, Nodes, Tree};
 
 #[macro_use]
 extern crate pest_derive;
@@ -37,12 +37,13 @@ impl Command for Series {
 impl Command for Operation {
     fn execute<T: Tree + 'static, I: Nodes<T> + 'static>(self, iter: I) -> Box<dyn DynNodes<T>> {
         match self {
-            Self::Children => Box::new(Children::<T, I>::new(iter)),
-            Self::Descendants => Box::new(Descendants::<T, I>::new(iter)),
             Self::Parallel(select) => select.execute(iter),
             Self::Condition(select) => Box::new(Condition::new(iter, move |tree: T| {
                 select.clone().execute::<T, T>(tree)
             })),
+            Self::Descendants => Box::new(Descendants::<T, I>::new(iter)),
+            Self::Children => Box::new(Children::<T, I>::new(iter)),
+            Self::Token(token) => Box::new(iter.filter(move |node| node.name() == token)),
             _ => todo!(),
         }
     }
