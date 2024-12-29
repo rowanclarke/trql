@@ -1,5 +1,7 @@
 use dyn_clone::DynClone;
-use std::{marker::PhantomData, ops::Index};
+use std::marker::PhantomData;
+
+use crate::chain;
 
 pub trait Node: Clone {
     type Tree: Tree<Node = Self>;
@@ -33,34 +35,7 @@ impl<T: Tree> Clone for Box<dyn DynNodes<T>> {
     }
 }
 
-#[derive(Clone)]
-pub struct Chain<T: Tree> {
-    index: usize,
-    iters: Vec<Box<dyn DynNodes<T>>>,
-}
-
-impl<T: Tree> Chain<T> {
-    pub fn new(iters: Vec<Box<dyn DynNodes<T>>>) -> Self {
-        Self { index: 0, iters }
-    }
-}
-
-impl<T: Tree> Iterator for Chain<T> {
-    type Item = T::Node;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if let Some(iter) = self.iters.get_mut(self.index) {
-            if let Some(node) = iter.next() {
-                Some(node)
-            } else {
-                self.index += 1;
-                self.next()
-            }
-        } else {
-            None
-        }
-    }
-}
+pub type Chain<T> = chain::Chain<Box<dyn DynNodes<T>>>;
 
 #[derive(Clone)]
 pub struct Children<T: Tree, I: Nodes<T>> {
@@ -158,6 +133,3 @@ impl<T: Tree, I: Nodes<T>, J: Iterator<Item = T::Node>, F: FnMut(T) -> J> Iterat
             .find(|node| (self.f)(node.clone().tree()).next().is_some())
     }
 }
-
-#[cfg(test)]
-mod tests {}
