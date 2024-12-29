@@ -48,5 +48,36 @@ impl<T: Tree, I: Iterator<Item = T::Node>> Iterator for Children<T, I> {
     }
 }
 
+pub struct Descendants<T: Tree, I: Iterator<Item = T::Node>> {
+    iter: I,
+    flat_child: Option<<T::Node as Node>::FlatTree>,
+}
+
+impl<T: Tree, I: Iterator<Item = T::Node>> Descendants<T, I> {
+    pub fn new(mut iter: I) -> Self {
+        Self {
+            flat_child: iter.next().map(Node::flat_tree),
+            iter,
+        }
+    }
+}
+
+impl<T: Tree, I: Iterator<Item = T::Node>> Iterator for Descendants<T, I> {
+    type Item = T::Node;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(tree) = &mut self.flat_child {
+            if let Some(node) = tree.next() {
+                Some(node)
+            } else {
+                self.flat_child = self.iter.next().map(|node| node.flat_tree());
+                self.next()
+            }
+        } else {
+            None
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {}
