@@ -25,12 +25,13 @@ jobs:
           version: latest
       - name: Run Build
         run: wasm-pack build --target web --out-dir web/dist
+        working-directory: site
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: web
+          path: site/web
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
