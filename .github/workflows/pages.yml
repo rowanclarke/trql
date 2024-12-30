@@ -1,0 +1,36 @@
+name: pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  pages:
+    name: GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Setup wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: latest
+      - name: Run Build
+        run: wasm-pack build --target web --out-dir web/dist
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: web
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
