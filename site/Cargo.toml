@@ -11,4 +11,5 @@ wasm-bindgen = "0.2"
 from-pest = "0.3.2"
 pest = "2.7.13"
 pest_derive = "2.7.13"
-trql = { version = "0.2.0", path = "../trql" }
+trql = { version = "0.2.1", path = "../trql" }
+jsonxf = "1.1.1"
