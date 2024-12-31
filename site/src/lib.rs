@@ -1,13 +1,13 @@
+mod tree;
+
+use pest::Parser;
+use tree::{to_tree, Rule, TreeParser};
+use trql::query;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-extern "C" {
-    // Import `alert` from JS runtime
-    fn alert(s: &str);
-}
-
-// Export `greet`
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, world!");
+pub fn execute(tree: &str, query: &str) -> String {
+    let tree = to_tree(TreeParser::parse(Rule::nodes, tree).unwrap());
+    query::execute(query, tree)
+    // format!("{:?}", tree)
 }

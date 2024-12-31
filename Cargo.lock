@@ -246,6 +246,10 @@ dependencies = [
 name = "site"
 version = "0.1.0"
 dependencies = [
+ "from-pest",
+ "pest",
+ "pest_derive",
+ "trql",
  "wasm-bindgen",
 ]
 
