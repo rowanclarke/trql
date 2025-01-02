@@ -1,0 +1,3 @@
+literal = { ('a'..'z')+ }
+nodes = _{ node? ~ (NEWLINE ~ node)* }
+node = { literal ~ ": " ~ literal ~ (NEWLINE ~ PEEK[..] ~ PUSH("  ") ~ node ~ DROP)*}

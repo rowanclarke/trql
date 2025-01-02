@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use pest::Parser;
 
 use crate::tree::{DynNodes, Node, Tree};
-use command::Command;
+pub use command::Command;
 use parser::{to_queries, QueryParser, Rule};
 
 pub fn execute<'a, T: Tree + 'a, I: QueryResult<'a, T>>(queries: &str, tree: T) -> I {
@@ -76,8 +76,8 @@ pub type Queries = BTreeMap<Option<String>, Vec<Query>>;
 
 #[derive(Debug, Clone)]
 pub struct Query {
-    pub(crate) select: Select,
-    pub(crate) subqueries: Queries,
+    pub select: Select,
+    pub subqueries: Queries,
 }
 
 impl Query {

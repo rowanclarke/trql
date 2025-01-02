@@ -1,13 +1,14 @@
+mod object;
+mod tree;
+
+use object::Object;
+use pest::Parser;
+use tree::{to_tree, Rule, TreeParser};
+use trql::query;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-extern "C" {
-    // Import `alert` from JS runtime
-    fn alert(s: &str);
-}
-
-// Export `greet`
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, world!");
+pub fn execute(tree: &str, query: &str) -> String {
+    let tree = to_tree(TreeParser::parse(Rule::nodes, tree).unwrap());
+    serde_yml::to_string(&query::execute::<_, Object>(query, tree)).unwrap()
 }
