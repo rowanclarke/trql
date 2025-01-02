@@ -1,58 +1,64 @@
-use std::collections::BTreeMap;
+use serde::{Serialize, Serializer};
+use std::{
+    array,
+    collections::{BTreeMap, HashMap},
+};
 
 use trql::{
     query::{Command, Queries, Query, QueryResult},
     tree::{DynNodes, Node, Tree},
 };
 
-pub struct ObjectString(pub String);
+#[derive(Clone)]
+pub enum Object {
+    Array(Vec<Object>),
+    Map(BTreeMap<String, Vec<Object>>),
+    Value(String),
+}
 
-impl<'a, T: Tree + 'a> QueryResult<'a, T> for ObjectString {
-    fn from_nodes(queries: Queries, nodes: Box<dyn DynNodes<T> + 'a>) -> Self {
-        let objects: BTreeMap<Option<String>, String> = queries
-            .into_iter()
-            .map(|(name, queries)| {
-                let mut result = if let Some(name) = &name {
-                    format!("{}: [", name)
-                } else {
-                    format!("[")
-                };
-                queries
-                    .into_iter()
-                    .for_each(|Query { select, subqueries }| {
-                        select
-                            .clone()
-                            .execute::<T, _>(nodes.clone())
-                            .enumerate()
-                            .for_each(|(i, node)| {
-                                if i > 0 {
-                                    result += ",";
-                                }
-                                result +=
-                                    &<Self as QueryResult<T>>::from_node(subqueries.clone(), node)
-                                        .0;
-                            });
-                    });
-                result += "]";
-                (name, result)
-            })
-            .collect();
-        if let Some(result) = objects.get(&None) {
-            Self(result.clone())
-        } else {
-            Self(format!(
-                "{{{}}}",
-                objects
-                    .into_values()
-                    .enumerate()
-                    .fold(String::new(), |s, (i, result)| s
-                        + if i > 0 { "," } else { "" }
-                        + &result)
-            ))
+impl Serialize for Object {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Object::Array(vec) => vec.serialize(serializer),
+            Object::Map(map) => map.serialize(serializer),
+            Object::Value(value) => value.serialize(serializer),
         }
     }
+}
 
-    fn from_leaf(leaf: T::Node) -> Self {
-        Self(leaf.value().unwrap().to_owned())
+impl<'a, T: Tree + 'a> QueryResult<'a, T> for Object {
+    fn from_nodes(queries: Queries, nodes: Box<dyn DynNodes<T> + 'a>) -> Self {
+        let mut objects: BTreeMap<String, Vec<Object>> = BTreeMap::new();
+
+        for (name, queries) in queries {
+            let result: Vec<Object> = queries
+                .into_iter()
+                .flat_map(|Query { select, subqueries }| {
+                    select
+                        .clone()
+                        .execute::<T, _>(nodes.clone())
+                        .map(move |node| {
+                            <Self as QueryResult<T>>::from_node(subqueries.clone(), node)
+                        })
+                })
+                .collect();
+            match name {
+                Some(name) => {
+                    objects.insert(name, result);
+                }
+                None => {
+                    return Object::Array(result);
+                }
+            }
+        }
+
+        Object::Map(objects)
+    }
+
+    fn from_leaf(leaf: <T as Tree>::Node) -> Self {
+        Object::Value(<String as QueryResult<T>>::from_leaf(leaf))
     }
 }

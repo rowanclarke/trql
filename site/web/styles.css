@@ -13,7 +13,7 @@ body {
   gap: 20px;
 }
 
-.text {
+.cm-s-trql.CodeMirror {
   width: 300px;
   height: 300px;
   padding: 15px;
@@ -25,20 +25,61 @@ body {
   resize: none;
 }
 
-.text::placeholder {
-  color: #a3b7ca;
-}
-
-.text:focus,
-.text:hover {
+.cm-s-trql.CodeMirror.CodeMirror-focused,
+.cm-s-trql.CodeMirror:hover {
   border-color: #7593af;
   background-color: #fff;
   outline: none;
   box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
 }
 
+.cm-s-trql .CodeMirror-placeholder {
+  color: #a3b7ca;
+}
+
 @media (max-width: 980px) {
-  .text {
+  .cm-s-trql.CodeMirror {
     width: calc((100vw - 180px) / 3);
   }
+}
+
+#query-editor span.cm-name {
+  color: #c7522a;
+}
+
+#query-editor span.cm-token {
+  color: #008585;
+}
+
+#query-editor span.cm-range {
+  color: #e5c185;
+}
+
+#query-editor span.cm-other {
+  color: #74a892;
+}
+
+#tree-editor span.cm-name {
+  color: #008585;
+}
+
+#tree-editor span.cm-value {
+  color: #74a892;
+}
+
+#output-editor.error {
+  background-color: #cba3a4;
+  color: #7d1c1f;
+}
+
+#output-editor #text {
+  color: #74a892;
+}
+
+#output-editor span.cm-name {
+  color: #c7522a;
+}
+
+#output-editor span.cm-value {
+  color: #74a892;
 }
