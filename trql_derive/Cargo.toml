@@ -1,6 +1,6 @@
 [package]
 name = "trql_derive"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Rowan Clarke <36474636+rowanclarke@users.noreply.github.com>"]
 license = "MIT"
 description = "Derive macro for the `trql` crate."
