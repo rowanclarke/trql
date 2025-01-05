@@ -37,6 +37,10 @@ body {
   color: #a3b7ca;
 }
 
+.CodeMirror-cursor {
+  height: inherit !important;
+}
+
 @media (max-width: 980px) {
   .cm-s-trql.CodeMirror {
     width: calc((100vw - 180px) / 3);
