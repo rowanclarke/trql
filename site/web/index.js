@@ -42,7 +42,8 @@ tree_editor.on("change", update);
 
 const output_editor = CodeMirror.fromTextArea(document.getElementById("output-textarea"), {
   mode: "yaml",
-  theme: "trql"
+  theme: "trql",
+  readOnly: true
 });
 const output_textarea = output_editor.getWrapperElement();
 output_textarea.id = "output-editor";
