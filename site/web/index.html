@@ -10,10 +10,50 @@
   </head>
   <body>
     <script type="module" src="./index.js"></script>
-    <div class="container">
-      <textarea id="tree-textarea" placeholder="Tree"></textarea>
-      <textarea id="query-textarea" placeholder="Query"></textarea>
-      <textarea id="output-textarea" placeholder="Output" readonly></textarea>
+    <div id="banner">
+      <div id="navbar" class="container">
+        <div id="navbar-left">
+          <a id="name" href="https://rowanclarke.github.io">rowanclarke</a>
+          <span class="divider"> / </span>
+          <a href="https://rowanclarke.github.io/trql">trql</a>
+          <div id="menu">
+            <a href="projects" class="nav-item">projects</a>
+            <a href="about" class="nav-item">about</a>
+          </div>
+        </div>
+        <div id="navbar-right">
+          <a href="https://github.com/rowanclarke"><img class="icon" src="assets/images/github.svg" alt="GitHub"/></a>
+          <a href="https://linkedin.com/in/rowan-n-clarke/"><img class="icon" src="assets/images/linkedin.svg" alt="LinkedIn"/></a>
+          <a href="mailto:rowanclarke@protonmail.com"><img class="icon" src="assets/images/mail.svg" alt="Email"/></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="down container text">
+      <p>
+        <code>trql</code> is a query language for a hierarchical structure of name-value pairs. It is written in Rust and designed to be
+        <b>accessible</b> and <b>performant</b>.
+      </p>
+      
+      <p>
+        This crate is used in the <a href="https://rowanclarke.github.io/remedy">remedy</a> ecosystem as an interface to decouple
+        syntactic structures in prose to concrete structures used in applications.
+      </p>
+      <p>
+        See the examples below to see how a tree of nodes can be reframed into various structures.
+      </p>
+    </div>
+    
+    <div class="accent">
+      <div id="demo" class="down container">
+        
+        <div> 
+          <textarea id="tree-textarea" placeholder="Tree"></textarea>
+          <textarea id="query-textarea" placeholder="Query"></textarea>
+          <textarea id="output-textarea" placeholder="Output" readonly></textarea>
+        </div>
+      </div>
+      
     </div>
   </body>
 </html>

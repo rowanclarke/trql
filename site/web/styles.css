@@ -1,28 +1,139 @@
 body {
   background-color: #d1dbe4;
-  font-family: 'Arial', sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  font-family: 'Quicksand', sans-serif;
   margin: 0;
+  color: #53575b;
+}
+
+code {
+  font-family: 'UbuntuMono', sans-serif;
+}
+
+#features {
+  justify-content: space-between;
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+#features>div {
+  width: 100%;
+  text-align: center;
 }
 
 .container {
+  max-width: 1030px;
+  margin: 0 auto;
   display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+.container.text {
+  max-width: 800px;
+  align-items: start;
+}
+
+#demo {
+  justify-content: center;
+}
+
+.down {
+  flex-direction: column;
+}
+
+#demo>div {
+  justify-content: space-between;
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.divider {
+  white-space: pre;
+}
+
+.accent {
+  background-color: #a3b7ca;
+  
+}
+
+#banner {
+  background-color: #476f95;
+  position: sticky;
+  padding: 10px 0px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  top: 0;
+  z-index: 1000;
+  font-size: 20px;
+}
+
+#navbar {
+  color: #fff;
+  padding: 0;
+  justify-content: space-between;
+}
+
+#navbar-left, #menu, #navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+#navbar-left {
+  flex: 1;
+  justify-content: flex-start;
+}
+
+#menu {
+  padding-left: 40px;
   gap: 20px;
 }
 
+#navbar-right {
+  flex: 1;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+#name {
+  font-weight: 600;
+}
+
+#navbar a {
+  text-decoration: none;
+  color: #fff;
+  padding: 2px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#navbar a:hover {
+  background-color: #7593af;
+  color: #fff;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+}
+
 .cm-s-trql.CodeMirror {
-  width: 300px;
+  max-width: 300px;
+  width: 100%;
   height: 300px;
   padding: 15px;
+  margin: -2px;
   border: 2px solid #a3b7ca;
   border-radius: 10px;
   background-color: #fff;
+  font-family: 'UbuntuMono', sans-serif;
   font-size: 16px;
   transition: all 0.3s ease;
   resize: none;
+}
+
+.CodeMirror-scroll {
+  cursor: text;
 }
 
 .cm-s-trql.CodeMirror.CodeMirror-focused,
@@ -41,10 +152,11 @@ body {
   height: inherit !important;
 }
 
-@media (max-width: 980px) {
-  .cm-s-trql.CodeMirror {
-    width: calc((100vw - 180px) / 3);
+@media (max-width: 1110px) {
+  #banner {
+    padding: 10px 20px;
   }
+  
 }
 
 #query-editor span.cm-name {
@@ -86,4 +198,46 @@ body {
 
 #output-editor span.cm-value {
   color: #74a892;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('assets/fonts/Quicksand-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('assets/fonts/Quicksand-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('assets/fonts/Quicksand-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('assets/fonts/Quicksand-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('assets/fonts/Quicksand-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'UbuntuMono';
+  src: url('assets/fonts/UbuntuMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
 }
