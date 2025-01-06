@@ -22,9 +22,9 @@
           </div>
         </div>
         <div id="navbar-right">
-          <a href="https://github.com/rowanclarke"><img class="icon" src="assets/images/github.svg" alt="GitHub"/></a>
-          <a href="https://linkedin.com/in/rowan-n-clarke/"><img class="icon" src="assets/images/linkedin.svg" alt="LinkedIn"/></a>
-          <a href="mailto:rowanclarke@protonmail.com"><img class="icon" src="assets/images/mail.svg" alt="Email"/></a>
+          <a class="icon" href="https://github.com/rowanclarke"><img src="assets/images/github.svg" alt="GitHub"/></a>
+          <a class="icon" href="https://linkedin.com/in/rowan-n-clarke/"><img src="assets/images/linkedin.svg" alt="LinkedIn"/></a>
+          <a class="icon" href="mailto:rowanclarke@protonmail.com"><img src="assets/images/mail.svg" alt="Email"/></a>
         </div>
       </div>
     </div>
@@ -37,23 +37,31 @@
       
       <p>
         This crate is used in the <a href="https://rowanclarke.github.io/remedy">remedy</a> ecosystem as an interface to decouple
-        syntactic structures in prose to concrete structures used in applications.
+        syntactic structures in prose and concrete structures used in applications.
       </p>
       <p>
-        See the examples below to see how a tree of nodes can be reframed into various structures.
+        See the examples queries below to see how a tree of nodes can be reframed into various structures.
       </p>
     </div>
     
     <div class="accent">
       <div id="demo" class="down container">
-        
-        <div> 
-          <textarea id="tree-textarea" placeholder="Tree"></textarea>
-          <textarea id="query-textarea" placeholder="Query"></textarea>
-          <textarea id="output-textarea" placeholder="Output" readonly></textarea>
+        <div id="example-carousel">
+          <span id="prev-example" class="icon"><img src="assets/images/left.svg"/></span>
+          <span id="example-title" class="title"></span>
+          <span id="next-example" class="icon"><img src="assets/images/right.svg"/></span>
         </div>
-      </div>
-      
+        <span id="example-subheading"></span>
+        <div id="inputs">
+          <textarea id="tree-textarea" placeholder="Tree" style="display: none;"></textarea>
+          <textarea id="query-textarea" placeholder="Query" style="display: none;"></textarea>
+          <textarea id="output-textarea" placeholder="Output" style="display: none;"></textarea>
+        </div>
+        <div style="width: 100%">
+          <span class="title">Exercises:</span>
+          <ul id="example-exercises"></ul>
+        </div>
+      </div>    
     </div>
   </body>
 </html>
