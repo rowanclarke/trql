@@ -89,6 +89,8 @@ output_textarea.id = "output-editor";
 
 function update() {
   output_editor.setValue(wasm.execute(tree_editor.getValue(), query_editor.getValue()));
+  
+  console.log("Hi");
 }
 
 const example_title = document.getElementById("example-title");
@@ -124,3 +126,4 @@ next_example.addEventListener('click', () => {
 });
 
 update_example();
+

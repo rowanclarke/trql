@@ -2,9 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>trql</title>
-    <link rel="stylesheet" href="./styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+    <title>remedy</title>
+    <link rel="stylesheet" href="https://rowanclarke.github.io/styles.css"/>
+    <link rel="stylesheet" href="https://rowanclarke.github.io/icons.css"/>
+    <link rel="stylesheet" href="https://rowanclarke.github.io/editors.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/mode/simple.min.js"></script>
   </head>
@@ -12,19 +14,17 @@
     <script type="module" src="./index.js"></script>
     <div id="banner">
       <div id="navbar" class="container">
-        <div id="navbar-left">
+        <div class="start">
           <a id="name" href="https://rowanclarke.github.io">rowanclarke</a>
-          <span class="divider"> / </span>
-          <a href="https://rowanclarke.github.io/trql">trql</a>
           <div id="menu">
-            <a href="https://rowanclarke.github.io/projects" class="nav-item">projects</a>
-            <a href="https://rowanclarke.github.io/about" class="nav-item">about</a>
+            <a href="https://rowanclarke.github.io/projects">projects</a>
+            <a href="https://rowanclarke.github.io/about">about</a>
           </div>
         </div>
-        <div id="navbar-right">
-          <a class="icon" href="https://github.com/rowanclarke"><img src="assets/images/github.svg" alt="GitHub"/></a>
-          <a class="icon" href="https://linkedin.com/in/rowan-n-clarke/"><img src="assets/images/linkedin.svg" alt="LinkedIn"/></a>
-          <a class="icon" href="mailto:rowanclarke@protonmail.com"><img src="assets/images/mail.svg" alt="Email"/></a>
+        <div class="icons">
+          <a class="icon" href="https://github.com/rowanclarke"><i class="github"></i></a>
+          <a class="icon" href="https://linkedin.com/in/rowan-n-clarke/"><i class="linkedin"></i></a>
+          <a class="icon" href="mailto:rowanclarke@protonmail.com"><i class="mail"></i></a>
         </div>
       </div>
     </div>
@@ -34,22 +34,21 @@
         <code>trql</code> is a query language for a hierarchical structure of name-value pairs. It is written in Rust and designed to be
         <b>accessible</b> and <b>performant</b>.
       </p>
-      
       <p>
         This crate is used in the <a href="https://rowanclarke.github.io/remedy">remedy</a> ecosystem as an interface to decouple
         syntactic structures in prose and concrete structures used in applications.
       </p>
       <p>
-        See the examples queries below to see how a tree of nodes can be reframed into various structures.
+        See the example queries below to see how a tree of nodes can be reframed into various structures and try some of the exercises.
       </p>
     </div>
     
     <div class="accent">
       <div id="demo" class="down container">
         <div id="example-carousel">
-          <span id="prev-example" class="icon"><img src="assets/images/left.svg"/></span>
+          <span id="prev-example" class="icon"><i class="left"></i></span>
           <span id="example-title" class="title"></span>
-          <span id="next-example" class="icon"><img src="assets/images/right.svg"/></span>
+          <span id="next-example" class="icon"><i class="right"></i></span>
         </div>
         <span id="example-subheading"></span>
         <div id="inputs">
